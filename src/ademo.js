@@ -1,4 +1,4 @@
-import {fn} from 'src/tool';
+import {fn} from 'src/tool.js';
 
 
 export default  () => {

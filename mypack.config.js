@@ -1,4 +1,3 @@
-const fs = require('fs');
 const path = require('path');
 
 module.exports = {
@@ -6,5 +5,14 @@ module.exports = {
     output: {
         path: path.resolve(__dirname, './build'),
         filename: 'build.js'
-    }
+    },
+    module: {
+        rules: [
+            {
+                test: '.cmr',
+                loader: path.join(__dirname, './pulgins/cmr_loader.js'),
+            }
+        ]
+    },
+    port: '8888'
 };

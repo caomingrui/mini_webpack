@@ -4,5 +4,9 @@
     "@babel/parser": "^7.17.8",
     "@babel/preset-env": "^7.16.11",
     "@babel/traverse": "^7.17.3"
+  },
+  "scripts": {
+    "start": "node main.js",
+    "test": "node --inspect-brk main.js"
   }
 }
