@@ -10,23 +10,6 @@ const t = require('@babel/types');
 
 const eventEmitter = new events.EventEmitter();
 
-// route 根路径
-eventEmitter.on('/', function(method, response){
-    const filepath = path.resolve(__dirname, './build/index.html');
-    fs.readFile(filepath, (err, data) => {
-        response.writeHead(200, {'Content-Type': 'text/html;charset=utf8'});
-        response.end(data);
-    });
-});
-
-eventEmitter.on('/build.js', function(method, response){
-    const filepath = path.resolve(__dirname, './build/build.js');
-    fs.readFile(filepath, (err, data) => {
-        response.writeHead(200, {'Content-Type': 'application/x-javascript;charset=utf8'});
-        response.end(data);
-    });
-});
-
 // route 404
 eventEmitter.on('404', function(method, url, response){
     response.writeHead(404, {'Content-Type': 'text/plain'});
@@ -190,8 +173,10 @@ class Compiler {
         })(${JSON.stringify(code)})`;
 
         fs.writeFileSync(filePath, bundle, 'utf-8');
-        console.log(`服务启动成功 http://localhost:${this.port}/`);
+        console.log(`服务启动成功 http://localhost:${this.port}/index.html`);
         if (this.port) {
+            handOut(this.output.path);
+
             // 启动服务
             http.createServer(function (request, response) {
                 // 分发
@@ -208,3 +193,27 @@ class Compiler {
 
 const myPack = new Compiler(option);
 myPack.run();
+
+// 分发资源
+function handOut (path) {
+    fs.readdir(path, function (err, files) {
+        files.forEach((item) => {
+            eventEmitter.on('/' + item, function(method, response){
+                const filepath = path + '/' + item;
+                fs.readFile(filepath, (err, data) => {
+                    switch (item.split(1)) {
+                        case 'js': {
+                            response.writeHead(200, {'Content-Type': 'application/x-javascript;charset=utf8'});
+                            break;
+                        }
+                        case 'html': {
+                            response.writeHead(200, {'Content-Type': 'text/html;charset=utf8'});
+                            break;
+                        }
+                    }
+                    response.end(data);
+                });
+            });
+        });
+    });
+}
